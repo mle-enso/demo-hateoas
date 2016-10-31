@@ -3,15 +3,19 @@ package demo.hateoas;
 import java.util.Arrays;
 import java.util.Locale;
 
+import groovy.transform.ToString;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public enum PageMapping {
-	OFFER_EN(Page.OFFER, Locale.UK, "offer"), OFFER_DE(Page.OFFER, Locale.GERMANY, "angebot"),
+	OFFER_EN(Page.OFFER, Locale.UK, "offer"),
+	OFFER_DE(Page.OFFER, Locale.GERMANY, "angebot"),
 
-	LIST_EN(Page.LIST, Locale.UK, "list"), LIST_DE(Page.LIST, Locale.GERMANY, "liste");
+	LIST_EN(Page.LIST, Locale.UK, "list"),
+	LIST_DE(Page.LIST, Locale.GERMANY, "liste");
 
 	private Page page;
 	private Locale locale;
