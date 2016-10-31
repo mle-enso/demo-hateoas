@@ -19,14 +19,16 @@ public class HateoasController {
 	@RequestMapping("/{pathVar:list|liste}")
 	public Map<String, String> list(@PathVariable String pathVar, @RequestParam Locale locale) {
 		validateCurrentPathVar(Page.LIST, pathVar, locale);
-		Link offerLink = linkTo(methodOn(HateoasController.class).offer(pathVar, locale)).withRel("offer");
+		String offerPathVar = PageMapping.valueOf(Page.OFFER, locale).getPathVar();
+		Link offerLink = linkTo(methodOn(HateoasController.class).offer(offerPathVar, locale)).withRel("offer");
 		return ImmutableMap.of("currentPathVar", pathVar, "nextLink", offerLink.getHref());
 	}
 
 	@RequestMapping("/{pathVar:offer|angebot}")
 	public Map<String, String> offer(@PathVariable String pathVar, @RequestParam Locale locale) {
 		validateCurrentPathVar(Page.OFFER, pathVar, locale);
-		Link listLink = linkTo(methodOn(HateoasController.class).offer(pathVar, locale)).withRel("list");
+		String listPathVar = PageMapping.valueOf(Page.LIST, locale).getPathVar();
+		Link listLink = linkTo(methodOn(HateoasController.class).offer(listPathVar, locale)).withRel("list");
 		return ImmutableMap.of("currentPathVar", pathVar, "nextLink", listLink.getHref());
 	}
 
