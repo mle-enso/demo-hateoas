@@ -1,4 +1,4 @@
-package demo.hatoas;
+package demo.hateoas;
 
 public enum Page {
 	LIST, OFFER

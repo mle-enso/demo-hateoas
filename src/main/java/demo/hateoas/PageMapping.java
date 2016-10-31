@@ -1,4 +1,4 @@
-package demo.hatoas;
+package demo.hateoas;
 
 import java.util.Arrays;
 import java.util.Locale;
