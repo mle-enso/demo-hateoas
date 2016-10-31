@@ -39,4 +39,29 @@ public class HateoasControllerTest extends AbstractTestNGSpringContextTests {
 				.body("currentPathVar", is(path))
 				.body("nextLink", is("http://localhost:" + port + "/" + nextLink + "?locale=" + locale));
 	}
+
+	@Test
+	public void invalidPathMapping() {
+		RestAssured
+				.given()
+				.baseUri("http://localhost").port(port)
+				.when()
+				.param("locale", "de_DE")
+				.get("list")
+				.then()
+				.statusCode(400)
+				.body("[0]", is("list is no valid path variable for page LIST and locale de_DE"));
+	}
+
+	@Test
+	public void invalidPathVar() {
+		RestAssured
+				.given()
+				.baseUri("http://localhost").port(port)
+				.when()
+				.param("locale", "en_GB")
+				.get("muell")
+				.then()
+				.statusCode(404);
+	}
 }
