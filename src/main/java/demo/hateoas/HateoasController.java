@@ -33,13 +33,12 @@ public class HateoasController {
 	public Map<String, String> offer(@PathVariable String pathVar, @RequestParam Locale locale) {
 		validateCurrentPathVar(Page.OFFER, pathVar, locale);
 		String listPathVar = PageMapping.valueOf(Page.LIST, locale).getPathVar();
-		Link listLink = linkTo(methodOn(HateoasController.class).offer(listPathVar, locale)).withRel("list");
+		Link listLink = linkTo(methodOn(HateoasController.class).list(listPathVar, locale)).withRel("list");
 		return ImmutableMap.of("currentPathVar", pathVar, "nextLink", listLink.getHref());
 	}
 
 	private void validateCurrentPathVar(Page page, String pathVar, Locale locale) {
-		PageMapping mapping = PageMapping.valueOf(page, locale);
-		if (!mapping.getPathVar().equals(pathVar))
+		if (!PageMapping.valueOf(page, locale).getPathVar().equals(pathVar))
 			throw new IllegalArgumentException(
 					pathVar + " is no valid path variable for page " + page + " and locale " + locale);
 	}
