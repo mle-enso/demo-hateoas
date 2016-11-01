@@ -1,0 +1,39 @@
+= Documentation of the HATEOAS demo infrastructure
+
+:docinfo:
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: googlecode
+:toc: left
+:toclevels: 4
+:sectlinks:
+:sectnums:
+:linkattrs:
+
+
+The demo shows a common use case for multiple request mappings and HATEOAS-assembled links.
+
+
+[[resources]]
+= Main entry point 
+
+Just use the example call below and follow the links provided by its response.
+
+[[hateoas]]
+== Calling a German offer aka Angebot
+
+You can call it manually via…
+include::{snippets}/hateoas/curl-request.adoc[]
+
+…regarding the following request parameter…
+include::{snippets}/hateoas/request-parameters.adoc[]
+
+The request looks like…
+include::{snippets}/hateoas/http-request.adoc[]
+
+The response looks like
+include::{snippets}/hateoas/http-response.adoc[]
+
+…and has the following detailed semantics…
+include::{snippets}/hateoas/response-fields.adoc[]
