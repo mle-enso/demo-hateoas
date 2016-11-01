@@ -127,7 +127,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.19.1</version>
 				<executions>
 					<execution>
 						<phase>integration-test</phase>
@@ -141,7 +140,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
 				<configuration>
 					<includes>
 						<include>**/*Documentation.java</include>
@@ -160,7 +158,7 @@
 							<goal>process-asciidoc</goal>
 						</goals>
 						<configuration>
-							<backend>html</backend>
+							<backend>html5</backend>
 							<doctype>book</doctype>
 							<sourceHighlighter>highlight.js</sourceHighlighter>
 							<attributes>

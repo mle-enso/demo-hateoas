@@ -1,27 +1,94 @@
 = Documentation of the HATEOAS demo infrastructure
-
+:toc:
 :docinfo:
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
-:highlightjs-theme: googlecode
-:toc: left
-:toclevels: 4
+:highlightjs-theme: school_book
 :sectlinks:
 :sectnums:
 :linkattrs:
 
 
-The demo shows a common use case for multiple request mappings and HATEOAS-assembled links.
+The demo shows a common use case for multiple request mappings and HATEOAS-assembled links
+with the infrastructural work behind it.
 
 
-[[resources]]
-= Main entry point 
+[[general]]
+== General
 
-Just use the example call below and follow the links provided by its response.
+The following code snippet explains the idea behind connecting multiple `@RequestMapping`
+annotations in conjunction with HATEOAS link generation.
+
+[[controller]]
+=== Controller layout
+
+[source,java]
+----
+@ResponseBody
+@RequestMapping("/{pathVar:offer|angebot}")  # <1>
+public Map<String, String> offer(@PathVariable String pathVar, @RequestParam Locale locale) {
+    validateCurrentPathVar(Page.OFFER, pathVar, locale);  # <2>
+    String listPathVar = PageMapping.valueOf(Page.LIST, locale).getPathVar();  # <3>
+    Link listLink = linkTo(methodOn(HateoasController.class).list(listPathVar, locale)).withRel("list");  # <4>
+    return ImmutableMap.of("currentPathVar", pathVar, "nextLink", listLink.getHref());
+}
+
+private void validateCurrentPathVar(Page page, String pathVar, Locale locale) {
+    if (!PageMapping.valueOf(page, locale).getPathVar().equals(pathVar))
+      throw new IllegalArgumentException(
+          pathVar + " is no valid path variable for page " + page + " and locale " + locale);
+}
+----
+<1> Valid path variable expressions in regular expression style. URLs with both path variables will a priori
+be possible, a locale-specific validation is not done in this step. `HTTP 404 – Not found` will be returned
+if the path variable in the request does not match the regular expression.
+<2> Validates if the path variable of the current request matches with the locale-specific one for this endpoint.
+If not, Spring exception handling will take over and throw `HTTP 400 – Bad request` (not shown here).
+<3> The locale-specific path variable for another endpoint is selected with respect of the known enum values in the `PageMapping.java` class (see below).
+<4> Spring HATEOAS assembles a strongly typed and per definition correct URL to another endpoint.
+
+[[page-mapping]]
+=== Pages and Page mapping
+
+[source,java]
+----
+public enum Page {
+    LIST, OFFER
+}
+----
+
+[source,java]
+----
+@Getter
+@ToString
+@AllArgsConstructor
+public enum PageMapping {
+    OFFER_EN(Page.OFFER, Locale.UK, "offer"),
+    OFFER_DE(Page.OFFER, Locale.GERMANY, "angebot"),
+    
+    LIST_EN(Page.LIST, Locale.UK, "list"),
+    LIST_DE(Page.LIST, Locale.GERMANY, "liste");
+    
+    private Page page;
+    private Locale locale;
+    private String pathVar;
+    
+    public static PageMapping valueOf(Page page, Locale locale) {
+        return Arrays.stream(values())
+            .filter(mapping -> mapping.getPage() == page && mapping.getLocale().equals(locale))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No page mapping found for page " + page + " and locale " + locale));
+    }
+}
+----
+
 
 [[hateoas]]
-== Calling a German offer aka Angebot
+== Calling the endpoint
+
+Below you will find an example call – follow the links provided by its response
+to move around the controller endpoints.
 
 You can call it manually via…
 include::{snippets}/hateoas/curl-request.adoc[]
