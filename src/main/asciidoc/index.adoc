@@ -111,7 +111,7 @@ include::{snippets}/hateoas/http-response.adoc[]
 …and has the following detailed semantics…
 include::{snippets}/hateoas/response-fields.adoc[]
 
-=== Without the use of X-Forwarded-Host
+=== The X-Forwarded-Host feature
 
 NOTE: Watch the request header and the corresponding URL in the response!
 
