@@ -87,6 +87,12 @@ public enum PageMapping {
 [[hateoas]]
 == Calling the endpoint
 
+For generating links, Spring HATEOAS per default only takes the current request URI in account.
+However it obeys the X-Forwarded-Host header, e. g. for generating correct links for clients outside a load balancer.
+Examples of the two methods are shown below.
+
+=== Without host header forwarding
+
 Below you will find an example call – follow the links provided by its response
 to move around the controller endpoints.
 
@@ -99,8 +105,31 @@ include::{snippets}/hateoas/request-parameters.adoc[]
 The request looks like…
 include::{snippets}/hateoas/http-request.adoc[]
 
-The response looks like
+The response looks like…
 include::{snippets}/hateoas/http-response.adoc[]
 
 …and has the following detailed semantics…
 include::{snippets}/hateoas/response-fields.adoc[]
+
+=== Without the use of X-Forwarded-Host
+
+NOTE: Watch the request header and the corresponding URL in the response!
+
+You can call it manually via…
+include::{snippets}/x-forwarded-host/curl-request.adoc[]
+
+…regarding the following request parameter…
+include::{snippets}/x-forwarded-host/request-parameters.adoc[]
+
+…and request header…
+include::{snippets}/x-forwarded-host/request-headers.adoc[]
+
+The request looks like…
+include::{snippets}/x-forwarded-host/http-request.adoc[]
+
+The response looks like…
+include::{snippets}/x-forwarded-host/http-response.adoc[]
+
+…and has the following detailed semantics…
+include::{snippets}/x-forwarded-host/response-fields.adoc[]
+

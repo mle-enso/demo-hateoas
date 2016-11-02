@@ -2,6 +2,8 @@ package demo.hateoas;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -75,6 +77,27 @@ public class HateoasControllerDocumentation extends AbstractTestNGSpringContextT
 		.statusCode(200)
 		.body("currentPathVar", is(path))
 		.body("nextLink", is("http://localhost:" + port + "/" + nextLink + "?locale=" + locale));
+	}
+
+	@Test
+	public void xForwardedFor() {
+		given(getPlainRequestSpec())
+		.baseUri("http://localhost").port(port)
+		.when()
+		.filter(document("x-forwarded-host",
+				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("locale").description("The locale for the current request, to determine the correct path variable during validation")),
+				requestHeaders(headerWithName("X-Forwarded-Host").description("The host for which the link shall be created.")),
+				responseFields(
+						fieldWithPath("currentPathVar").description("The path variable used for the current request"),
+						fieldWithPath("nextLink").description("Locale-specific link to the other controller endpoint"))))
+		.param("locale", "en_GB")
+		.header("X-Forwarded-Host", "test.de:9090")
+		.get("list")
+		.then()
+		.statusCode(200)
+		.body("currentPathVar", is("list"))
+		.body("nextLink", is("http://test.de:9090/offer?locale=en_GB"));
 	}
 
 	@Test
