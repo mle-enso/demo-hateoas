@@ -550,7 +550,7 @@ to move around the controller endpoints.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:33942/angebot?locale=de_DE' -i -H 'Accept: */*'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:49150/angebot?locale=de_DE' -i -X GET</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -580,8 +580,7 @@ to move around the controller endpoints.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /angebot?locale=de_DE HTTP/1.1
-Accept: */*
-Host: localhost:33942</code></pre>
+Host: localhost:49150</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -590,15 +589,14 @@ Host: localhost:33942</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-X-Application-Context: application:0
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Wed, 02 Nov 2016 19:48:23 GMT
+Date: Tue, 26 Jun 2018 08:41:02 GMT
 Content-Length: 94
 
 {
   "currentPathVar" : "angebot",
-  "nextLink" : "http://localhost:33942/liste?locale=de_DE"
+  "nextLink" : "http://localhost:49150/liste?locale=de_DE"
 }</code></pre>
 </div>
 </div>
@@ -651,7 +649,8 @@ Watch the request header and the corresponding URL in the response!
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:33942/list?locale=en_GB' -i -H 'X-Forwarded-Host: test.de:9090' -H 'Accept: */*'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:49150/list?locale=en_GB' -i -X GET \
+    -H 'X-Forwarded-Host: test.de:9090'</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -703,8 +702,7 @@ Watch the request header and the corresponding URL in the response!
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /list?locale=en_GB HTTP/1.1
 X-Forwarded-Host: test.de:9090
-Accept: */*
-Host: localhost:33942</code></pre>
+Host: localhost:49150</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -713,10 +711,9 @@ Host: localhost:33942</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-X-Application-Context: application:0
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Wed, 02 Nov 2016 19:48:23 GMT
+Date: Tue, 26 Jun 2018 08:41:02 GMT
 Content-Length: 88
 
 {
@@ -760,7 +757,7 @@ Content-Length: 88
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-02 19:31:11 MEZ
+Last updated 2016-11-03 08:54:18 +01:00
 </div>
 </div>
 </body>
