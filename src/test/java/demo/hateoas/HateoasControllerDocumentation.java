@@ -15,9 +15,9 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 import java.lang.reflect.Method;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.restdocs.ManualRestDocumentation;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.AfterMethod;
@@ -28,100 +28,100 @@ import org.testng.annotations.Test;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 
-
-
-
 @SpringBootTest(classes = DemoApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class HateoasControllerDocumentation extends AbstractTestNGSpringContextTests {
-	private ManualRestDocumentation restDocumentation = new ManualRestDocumentation("target/generated-snippets");
+	private ManualRestDocumentation restDocumentation = new ManualRestDocumentation();
 
 	@BeforeMethod
 	public void setUp(Method method) {
-		restDocumentation.beforeTest(getClass(), method.getName());
+		this.spec = new RequestSpecBuilder()
+				.addFilter(documentationConfiguration(this.restDocumentation))
+				.setBaseUri("http://localhost")
+				.setPort(port)
+				.build();
+		this.restDocumentation.beforeTest(getClass(), method.getName());
 	}
 
 	@AfterMethod
 	public void tearDown() {
-		restDocumentation.afterTest();
+		this.restDocumentation.afterTest();
 	}
 
-	public RequestSpecification getPlainRequestSpec() {
-		return new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation).snippets().withEncoding("UTF-8")).build();
-	}
-
-	@Value("${local.server.port}")
+	@LocalServerPort
 	int port;
 
-	@DataProvider(name = "urls")
-	public Object[][] urlPermutations() {
+	private RequestSpecification spec;
+
+	@DataProvider(name = "urlPermutations")
+	public static Object[][] urlPermutations() {
 		return new Object[][] {
-			{ "list", "offer", "en_GB" },
-			{ "liste", "angebot", "de_DE" },
-			{ "offer", "list", "en_GB" },
-			{ "angebot", "liste", "de_DE" } };
+				{ "list", "offer", "en_GB" },
+				{ "liste", "angebot", "de_DE" },
+				{ "offer", "list", "en_GB" },
+				{ "angebot", "liste", "de_DE" } };
 	}
 
-	@Test(dataProvider = "urls")
+	@Test(dataProvider = "urlPermutations")
 	public void urls(String path, String nextLink, String locale) {
-		given(getPlainRequestSpec())
-		.baseUri("http://localhost").port(port)
-		.when()
-		.filter(document("hateoas",
-				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("locale").description("The locale for the current request, to determine the correct path variable during validation")),
-				responseFields(
-						fieldWithPath("currentPathVar").description("The path variable used for the current request"),
-						fieldWithPath("nextLink").description("Locale-specific link to the other controller endpoint"))))
-		.param("locale", locale)
-		.get(path)
-		.then()
-		.statusCode(200)
-		.body("currentPathVar", is(path))
-		.body("nextLink", is("http://localhost:" + port + "/" + nextLink + "?locale=" + locale));
+		given(spec)
+				.when().filter(document("hateoas",
+						preprocessResponse(prettyPrint()),
+						requestParameters(parameterWithName("locale").description(
+								"The locale for the current request, to determine the correct path variable during validation")),
+						responseFields(
+								fieldWithPath("currentPathVar")
+										.description("The path variable used for the current request"),
+								fieldWithPath("nextLink")
+										.description("Locale-specific link to the other controller endpoint"))))
+				.param("locale", locale)
+				.get(path)
+				.then()
+				.statusCode(200)
+				.body("currentPathVar", is(path))
+				.body("nextLink", is("http://localhost:" + port + "/" + nextLink + "?locale=" + locale));
 	}
 
 	@Test
 	public void xForwardedFor() {
-		given(getPlainRequestSpec())
-		.baseUri("http://localhost").port(port)
-		.when()
-		.filter(document("x-forwarded-host",
-				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("locale").description("The locale for the current request, to determine the correct path variable during validation")),
-				requestHeaders(headerWithName("X-Forwarded-Host").description("The host for which the link shall be created.")),
-				responseFields(
-						fieldWithPath("currentPathVar").description("The path variable used for the current request"),
-						fieldWithPath("nextLink").description("Locale-specific link to the other controller endpoint"))))
-		.param("locale", "en_GB")
-		.header("X-Forwarded-Host", "test.de:9090")
-		.get("list")
-		.then()
-		.statusCode(200)
-		.body("currentPathVar", is("list"))
-		.body("nextLink", is("http://test.de:9090/offer?locale=en_GB"));
+		given(spec)
+				.when().filter(document("x-forwarded-host",
+						preprocessResponse(prettyPrint()),
+						requestParameters(parameterWithName("locale").description(
+								"The locale for the current request, to determine the correct path variable during validation")),
+						requestHeaders(headerWithName("X-Forwarded-Host")
+								.description("The host for which the link shall be created.")),
+						responseFields(
+								fieldWithPath("currentPathVar")
+										.description("The path variable used for the current request"),
+								fieldWithPath("nextLink")
+										.description("Locale-specific link to the other controller endpoint"))))
+				.param("locale", "en_GB")
+				.header("X-Forwarded-Host", "test.de:9090")
+				.get("list")
+				.then()
+				.statusCode(200)
+				.body("currentPathVar", is("list"))
+				.body("nextLink", is("http://test.de:9090/offer?locale=en_GB"));
 	}
 
 	@Test
 	public void invalidPathMapping() {
-		given(getPlainRequestSpec())
-		.baseUri("http://localhost").port(port)
-		.when()
-		.param("locale", "de_DE")
-		.get("list")
-		.then()
-		.statusCode(400)
-		.body("[0]", is("list is no valid path variable for page LIST and locale de_DE"));
+		given(spec)
+				.when()
+				.param("locale", "de_DE")
+				.get("list")
+				.then()
+				.statusCode(400)
+				.body("[0]", is("list is no valid path variable for page LIST and locale de_DE"));
 	}
 
 	@Test
 	public void invalidPathVar() {
-		given(getPlainRequestSpec())
-		.baseUri("http://localhost")
-		.port(port)
-		.when()
-		.param("locale", "en_GB")
-		.get("muell")
-		.then()
-		.statusCode(404);
+		given(spec)
+				.when()
+				.param("locale", "en_GB")
+				.get("muell")
+				.then()
+				.statusCode(404);
 	}
 }
